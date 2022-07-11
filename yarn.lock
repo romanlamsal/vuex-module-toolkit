@@ -86,6 +86,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@lamsal-de/eslint-config@npm:^1.0.4":
+  version: 1.0.4
+  resolution: "@lamsal-de/eslint-config@npm:1.0.4"
+  peerDependencies:
+    "@typescript-eslint/eslint-plugin": ^4.28.5
+    "@typescript-eslint/parser": ^4.28.5
+    eslint: ^7.31.0
+    eslint-config-prettier: ^8.3.0
+    eslint-plugin-prettier: ^3.4.0
+    eslint-plugin-react: ^7.24.0
+    eslint-plugin-unused-imports: ^1.1.2
+    prettier: ^2.4.1
+  checksum: a66e9deabac829c30b52fc3e161834f4b7550262c189a09a071427e176d0ce1e94c71024c28167d981c9f3795865dac9dcc3b4c58a622619d00ef79c9fef3d48
+  languageName: node
+  linkType: hard
+
 "@nodelib/fs.scandir@npm:2.1.5":
   version: 2.1.5
   resolution: "@nodelib/fs.scandir@npm:2.1.5"
@@ -608,24 +624,6 @@ __metadata:
   version: 4.0.0
   resolution: "escape-string-regexp@npm:4.0.0"
   checksum: 98b48897d93060f2322108bf29db0feba7dd774be96cd069458d1453347b25ce8682ecc39859d4bca2203cc0ab19c237bcc71755eff49a0f8d90beadeeba5cc5
-  languageName: node
-  linkType: hard
-
-eslint-config-lamsal@romanlamsal/lamsal-node-defaults:
-  version: 1.0.0
-  resolution: "eslint-config-lamsal@https://github.com/romanlamsal/lamsal-node-defaults.git#commit=b22913f49191623ff6574b992704fd566793bb16"
-  peerDependencies:
-    "@typescript-eslint/eslint-plugin": ^4.28.5
-    "@typescript-eslint/parser": ^4.28.5
-    eslint: ^7.31.0
-    eslint-config-prettier: ^8.3.0
-    eslint-plugin-prettier: ^3.4.0
-    eslint-plugin-react: ^7.24.0
-    eslint-plugin-unused-imports: ^1.1.2
-    prettier: ^2.4.1
-  bin:
-    lamsal-node-defaults: ./binary.js
-  checksum: 129e8ee875e72b92ad2999aa9bcc59738e858d9bd403493910b7a294b20c7728fd1e4ed53a71445d64a6906a753696f0214494f3adb4bdecedabf71c10597a78
   languageName: node
   linkType: hard
 
@@ -2065,10 +2063,10 @@ eslint-config-lamsal@romanlamsal/lamsal-node-defaults:
   version: 0.0.0-use.local
   resolution: "vuex-module-toolkit@workspace:."
   dependencies:
+    "@lamsal-de/eslint-config": ^1.0.4
     "@typescript-eslint/eslint-plugin": ^4.28.5
     "@typescript-eslint/parser": ^4.28.5
     eslint: ^7.31.0
-    eslint-config-lamsal: romanlamsal/lamsal-node-defaults
     eslint-config-prettier: ^8.3.0
     eslint-plugin-prettier: ^3.4.0
     eslint-plugin-react: ^7.24.0
