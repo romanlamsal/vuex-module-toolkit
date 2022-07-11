@@ -2001,7 +2001,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:^4.7.4":
+"typescript@npm:^4.2.4":
   version: 4.7.4
   resolution: "typescript@npm:4.7.4"
   bin:
@@ -2011,7 +2011,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@^4.7.4#~builtin<compat/typescript>":
+"typescript@patch:typescript@^4.2.4#~builtin<compat/typescript>":
   version: 4.7.4
   resolution: "typescript@patch:typescript@npm%3A4.7.4#~builtin<compat/typescript>::version=4.7.4&hash=7ad353"
   bin:
@@ -2072,10 +2072,11 @@ __metadata:
     eslint-plugin-react: ^7.24.0
     eslint-plugin-unused-imports: ^1.1.2
     prettier: ^2.4.1
-    typescript: ^4.7.4
+    typescript: ^4.2.4
     vue: ^2.6.14
     vuex: ^3.6.2
   peerDependencies:
+    typescript: ^4.2.4
     vue: ^2.6.14
     vuex: ^3.6.2
   languageName: unknown

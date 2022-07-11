@@ -9,9 +9,6 @@
   "scripts": {
     "build": "rm -rf dist && tsc"
   },
-  "dependencies": {
-    "typescript": "^4.7.4"
-  },
   "devDependencies": {
     "@lamsal-de/eslint-config": "^1.0.4",
     "@typescript-eslint/eslint-plugin": "^4.28.5",
@@ -22,10 +19,12 @@
     "eslint-plugin-react": "^7.24.0",
     "eslint-plugin-unused-imports": "^1.1.2",
     "prettier": "^2.4.1",
+    "typescript": "^4.2.4",
     "vue": "^2.6.14",
     "vuex": "^3.6.2"
   },
   "peerDependencies": {
+    "typescript": "^4.2.4",
     "vue": "^2.6.14",
     "vuex": "^3.6.2"
   },
