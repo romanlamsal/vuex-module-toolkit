@@ -104,3 +104,12 @@ dist
 .tern-port
 
 .idea
+
+# yarn2 ignores based on https://stackoverflow.com/a/60184331
+.yarn/*
+!.yarn/patches
+!.yarn/releases
+!.yarn/plugins
+!.yarn/sdks
+!.yarn/versions
+.pnp.*
