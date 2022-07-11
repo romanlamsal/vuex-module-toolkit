@@ -113,28 +113,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@romanlamsal/vuex-module-toolkit@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "@romanlamsal/vuex-module-toolkit@workspace:."
-  dependencies:
-    "@typescript-eslint/eslint-plugin": ^4.28.5
-    "@typescript-eslint/parser": ^4.28.5
-    eslint: ^7.31.0
-    eslint-config-lamsal: romanlamsal/lamsal-node-defaults
-    eslint-config-prettier: ^8.3.0
-    eslint-plugin-prettier: ^3.4.0
-    eslint-plugin-react: ^7.24.0
-    eslint-plugin-unused-imports: ^1.1.2
-    prettier: ^2.4.1
-    typescript: ^4.7.4
-    vue: ^2.6.14
-    vuex: ^3.6.2
-  peerDependencies:
-    vue: ^2.6.14
-    vuex: ^3.6.2
-  languageName: unknown
-  linkType: soft
-
 "@types/json-schema@npm:^7.0.7":
   version: 7.0.11
   resolution: "@types/json-schema@npm:7.0.11"
@@ -2082,6 +2060,28 @@ eslint-config-lamsal@romanlamsal/lamsal-node-defaults:
   checksum: 5347f88b43b9addf061944739550e00c19d031bf1f36d2b7c2eb321a3df7ff329be52eadd2fe7d267cd9358f8ba45386225fca8e77a863c6cdc67f2e3fdd9a89
   languageName: node
   linkType: hard
+
+"vuex-module-toolkit@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "vuex-module-toolkit@workspace:."
+  dependencies:
+    "@typescript-eslint/eslint-plugin": ^4.28.5
+    "@typescript-eslint/parser": ^4.28.5
+    eslint: ^7.31.0
+    eslint-config-lamsal: romanlamsal/lamsal-node-defaults
+    eslint-config-prettier: ^8.3.0
+    eslint-plugin-prettier: ^3.4.0
+    eslint-plugin-react: ^7.24.0
+    eslint-plugin-unused-imports: ^1.1.2
+    prettier: ^2.4.1
+    typescript: ^4.7.4
+    vue: ^2.6.14
+    vuex: ^3.6.2
+  peerDependencies:
+    vue: ^2.6.14
+    vuex: ^3.6.2
+  languageName: unknown
+  linkType: soft
 
 "vuex@npm:^3.6.2":
   version: 3.6.2
