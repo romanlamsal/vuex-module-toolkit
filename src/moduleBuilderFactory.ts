@@ -23,6 +23,7 @@ export const moduleBuilderFactory = <State, RootState, ConstructorArgs = unknown
     })
 
     return {
+        getModule,
         getNamespace: (nsArgs: NamespaceArgs) => namespaceBuilder(nsArgs),
         addAction: actionFactory.generate,
         addMutation: mutationFactory.generate,
