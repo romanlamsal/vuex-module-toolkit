@@ -22,6 +22,10 @@ jobs:
       - name: Yarn install with after reading cache
         run: yarn install
 
+      - name: Run tests
+        run: |
+          yarn test:coverage
+          exit $?
       - run: yarn build
 
       - run: |
