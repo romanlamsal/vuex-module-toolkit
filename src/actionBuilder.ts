@@ -16,7 +16,7 @@ export interface EnhancedAction<Payload = any, State = unknown, RootState = unkn
     extends EnhancedHandler<Payload, TypedActionHandler<Payload, State, RootState, ReturnValue>, NamespaceArgs, ActionEvent<Payload>> {
     (payload: Payload, options?: EnhancedHandlerOptions): ActionEvent<Payload>
 
-    dispatch: (store: Store<State>, payload: Payload, options?: EnhancedHandlerOptions) => Promise<ReturnValue>
+    dispatch: (store: Store<RootState>, payload: Payload, options?: EnhancedHandlerOptions) => Promise<ReturnValue>
     dispatchNamespaced: (
         store: Store<RootState>,
         nsArgs: NamespaceArgs,

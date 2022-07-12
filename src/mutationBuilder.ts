@@ -12,7 +12,7 @@ export interface EnhancedMutation<Payload, State, NamespaceArgs>
     extends EnhancedHandler<Payload, TypedMutationHandler<Payload, State>, NamespaceArgs, MutationEvent<Payload>> {
     (payload: Payload, options?: EnhancedHandlerOptions): MutationEvent<Payload>
 
-    commit: (store: Store<State>, payload: Payload, options?: EnhancedHandlerOptions) => void
+    commit: (store: Store<unknown>, payload: Payload, options?: EnhancedHandlerOptions) => void
     commitNamespaced: (store: Store<unknown>, nsArgs: NamespaceArgs, payload: Payload, options?: EnhancedHandlerOptions) => void
 }
 

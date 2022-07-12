@@ -19,9 +19,13 @@ jobs:
           path: '**/node_modules'
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: ${{ runner.os }}-yarn-
-      - name: Yarn install with after reading cache
+      - name: Yarn install after reading cache
         run: yarn install
 
+      - name: Run typecheck
+        run: |
+          yarn tsc --noEmit
+          exit $?
       - name: Run tests
         run: |
           yarn test:coverage
