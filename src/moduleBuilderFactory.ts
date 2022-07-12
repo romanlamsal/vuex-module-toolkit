@@ -1,25 +1,29 @@
-import { BuilderFactoryOptions } from "./types"
+import { BuilderFactoryOptions } from "./enhancedHandlerBuilder"
 import { actionBuilderFactory } from "./actionBuilderFactory"
 import { Module, Store } from "vuex"
 import { mutationBuilderFactory } from "./mutationBuilderFactory"
 
-type ModuleBuilderFactoryOptions<State, ConstructorArgs, NamespaceArgs> = BuilderFactoryOptions<NamespaceArgs> & {
-    state: (args: ConstructorArgs) => State
+type ModuleBuilderFactoryOptions<NamespaceArgs> = BuilderFactoryOptions<NamespaceArgs>
+
+type RegisterOptions<State, NamespaceArgs> = {
+    namespaceArgs: NamespaceArgs
+    initialState: State
+    continueOnDuplicate?: boolean
 }
 
-export const moduleBuilderFactory = <State, RootState, ConstructorArgs = unknown, NamespaceArgs = unknown>(
-    options: ModuleBuilderFactoryOptions<State, ConstructorArgs, NamespaceArgs>
+export const moduleBuilderFactory = <State, RootState = unknown, NamespaceArgs = never>(
+    options?: ModuleBuilderFactoryOptions<NamespaceArgs>
 ) => {
     const actionFactory = actionBuilderFactory<State, RootState, NamespaceArgs>(options)
     const mutationFactory = mutationBuilderFactory<State, NamespaceArgs>(options)
 
-    const namespaceBuilder: (args: NamespaceArgs & Partial<ConstructorArgs>) => string = options?.namespaceBuilder || (args => `${args}`)
+    const namespaceBuilder: (args: NamespaceArgs) => string = options?.namespaceBuilder || (args => `${args}`)
 
-    const getModule = (constructorArgs: ConstructorArgs & NamespaceArgs): Module<State, RootState> => ({
+    const getModule = (initialState: State): Module<State, RootState> => ({
         namespaced: true,
         mutations: mutationFactory.toMutationTree(),
         actions: actionFactory.toActionTree(),
-        state: options.state(constructorArgs),
+        state: initialState,
     })
 
     return {
@@ -30,19 +34,21 @@ export const moduleBuilderFactory = <State, RootState, ConstructorArgs = unknown
         hasModule: (store: Store<RootState>, nsArgs: NamespaceArgs) => store.hasModule(namespaceBuilder(nsArgs)),
         register: async (
             store: Store<RootState>,
-            constructorArgs: ConstructorArgs,
-            nsArgs: NamespaceArgs,
-            continueOnDuplicate?: boolean
+            { namespaceArgs, initialState, continueOnDuplicate }: RegisterOptions<State, NamespaceArgs>
         ) => {
-            const namespace = namespaceBuilder(nsArgs)
+            const namespace = namespaceBuilder(namespaceArgs)
 
             if (continueOnDuplicate && store.hasModule(namespace)) {
                 return false
             }
 
-            await store.registerModule(namespace, getModule({ ...constructorArgs, ...nsArgs }))
+            await store.registerModule(namespace, getModule(initialState))
             return true
         },
         unregister: async (store: Store<RootState>, nsArgs: NamespaceArgs) => store.unregisterModule(namespaceBuilder(nsArgs)),
+        storeState: (store: Store<RootState>, nsArgs: NamespaceArgs) => {
+            // @ts-ignore
+            return store.state[namespaceBuilder(nsArgs)]
+        },
     }
 }
