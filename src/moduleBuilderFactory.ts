@@ -3,6 +3,7 @@ import { actionBuilderFactory } from "./actionBuilderFactory"
 import { mapGetters, mapState, Module, Store } from "vuex"
 import { mutationBuilderFactory } from "./mutationBuilderFactory"
 import { EnhancedGetter, getterBuilderFactory } from "./getterBuilderFactory"
+import { createNamespacedFn } from "./util/createNamespacedFn"
 
 type ModuleBuilderFactoryOptions<NamespaceArgs> = BuilderFactoryOptions<NamespaceArgs>
 
@@ -20,15 +21,15 @@ type MapStateFn<State, NamespaceArgs> = NamespaceArgs extends void
     : (nsArgs: NamespaceArgs, expr: MapStateExpr<State>) => ReturnType<typeof mapState>
 
 type MapGettersFn<State, RootState, NamespaceArgs> = NamespaceArgs extends void
-    ? (...getters: EnhancedGetter<State, RootState>[]) => ReturnType<typeof mapGetters>
-    : (nsArgs: NamespaceArgs, ...getters: EnhancedGetter<State, RootState>[]) => ReturnType<typeof mapGetters>
+    ? (...getters: EnhancedGetter<State, RootState, NamespaceArgs>[]) => ReturnType<typeof mapGetters>
+    : (nsArgs: NamespaceArgs, ...getters: EnhancedGetter<State, RootState, NamespaceArgs>[]) => ReturnType<typeof mapGetters>
 
 export const moduleBuilderFactory = <State, RootState = unknown, NamespaceArgs = void>(
     options?: ModuleBuilderFactoryOptions<NamespaceArgs>
 ) => {
     const actionFactory = actionBuilderFactory<State, RootState, NamespaceArgs>(options)
     const mutationFactory = mutationBuilderFactory<State, NamespaceArgs>(options)
-    const getterFactory = getterBuilderFactory<State, RootState>()
+    const getterFactory = getterBuilderFactory<State, RootState, NamespaceArgs>()
 
     const namespaceBuilder: (args: NamespaceArgs) => string =
         options?.namespaceBuilder || (options?.namespace && (() => options.namespace!)) || (args => `${args}`)
@@ -41,28 +42,26 @@ export const moduleBuilderFactory = <State, RootState = unknown, NamespaceArgs =
         state: initialState,
     })
 
-    const namespaceFn: NamespaceFn<NamespaceArgs> = (
-        options?.namespace ? options.namespace! : namespaceBuilder
-    ) as NamespaceFn<NamespaceArgs>
+    const namespaceFn = createNamespacedFn(options, options?.namespace as string, namespaceBuilder) as NamespaceFn<NamespaceArgs>
 
-    const mapStateFn = (
-        options?.namespace
-            ? (((expr: MapStateExpr<State>) => mapState(options.namespace!, expr)) as MapStateFn<State, void>)
-            : (nsArgs: NamespaceArgs, expr: MapStateExpr<State>) => mapState(namespaceBuilder(nsArgs), expr)
+    const mapStateFn = createNamespacedFn<MapStateFn<State, void>, MapStateFn<State, any>>(
+        options,
+        (expr: MapStateExpr<State>) => mapState(options?.namespace as string, expr),
+        (nsArgs: NamespaceArgs, expr: MapStateExpr<State>) => mapState(namespaceBuilder(nsArgs), expr)
     ) as MapStateFn<State, NamespaceArgs>
 
-    const mapGettersFn = (
-        options?.namespace
-            ? (((...getters) =>
-                  mapGetters(
-                      options.namespace!,
-                      getters.map(getter => getter.type)
-                  )) as MapGettersFn<State, RootState, void>)
-            : (nsArgs: NamespaceArgs, ...getters: EnhancedGetter<State, RootState>[]) =>
-                  mapGetters(
-                      namespaceBuilder(nsArgs),
-                      getters.map(getter => getter.type)
-                  )
+    const mapGettersFn = createNamespacedFn<MapGettersFn<State, RootState, void>, MapGettersFn<State, RootState, any>>(
+        options,
+        (...getters) =>
+            mapGetters(
+                options!.namespace as string,
+                getters.map(getter => getter.type)
+            ),
+        (nsArgs: NamespaceArgs, ...getters: EnhancedGetter<State, RootState, NamespaceArgs>[]) =>
+            mapGetters(
+                namespaceBuilder(nsArgs) as string,
+                getters.map(getter => getter.type)
+            )
     ) as MapGettersFn<State, RootState, NamespaceArgs>
 
     return {

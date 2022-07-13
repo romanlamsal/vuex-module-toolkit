@@ -58,5 +58,32 @@ describe("getterBuilderFactory", () => {
                 rootGetters: args[3],
             })
         })
+
+        it("should return a string when calling namespaced, given a fixed namespace", () => {
+            // given
+            const namespace = "thenamespace"
+            const type = "sometype"
+            const getter = getterBuilderFactory({ namespace }).generate(type, () => {})
+
+            // when
+            const getterNamespaced = getter.namespaced
+
+            // then
+            expect(getterNamespaced).toEqual(namespace + "/" + type)
+        })
+
+        it("should return a string when calling namespaced, given a namespaceBuilder", () => {
+            // given
+            const type = "baz"
+            const namespaceArgs = "bar"
+            const namespaceBuilder = (args: string) => `foo/${args}`
+            const getter = getterBuilderFactory<unknown, unknown, string>({ namespaceBuilder }).generate(type, () => {})
+
+            // when
+            const getterNamespaced = getter.namespaced(namespaceArgs)
+
+            // then
+            expect(getterNamespaced).toEqual(namespaceBuilder(namespaceArgs) + "/" + type)
+        })
     })
 })
