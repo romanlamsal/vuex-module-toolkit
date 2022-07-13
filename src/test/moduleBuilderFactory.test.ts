@@ -1,8 +1,13 @@
 import { moduleBuilderFactory } from "../moduleBuilderFactory"
 import { mapGetters, mapState, Store } from "vuex"
+import { BuilderFactoryOptions } from "../enhancedHandlerBuilder"
+import { getterBuilderFactory } from "../getterBuilderFactory"
+import { mutationBuilderFactory } from "../mutationBuilderFactory"
+import { actionBuilderFactory } from "../actionBuilderFactory"
 
 const mockGenerateAction = jest.fn()
 const mockToActionTree = jest.fn()
+const mockActionBuilderFactory = actionBuilderFactory as jest.Mock
 jest.mock("../actionBuilderFactory", () => {
     return {
         actionBuilderFactory: jest.fn(() => ({
@@ -14,6 +19,7 @@ jest.mock("../actionBuilderFactory", () => {
 
 const mockGenerateMutation = jest.fn()
 const mockToMutationTree = jest.fn()
+const mockMutationBuilderFactory = mutationBuilderFactory as jest.Mock
 jest.mock("../mutationBuilderFactory", () => {
     return {
         mutationBuilderFactory: jest.fn(() => ({
@@ -25,6 +31,7 @@ jest.mock("../mutationBuilderFactory", () => {
 
 const mockGenerateGetter = jest.fn()
 const mockToGetterTree = jest.fn()
+const mockGetterBuilderFactory = getterBuilderFactory as jest.Mock
 jest.mock("../getterBuilderFactory", () => {
     return {
         getterBuilderFactory: jest.fn(() => ({
@@ -40,6 +47,17 @@ const mockMapGetters = mapGetters as jest.Mock
 
 describe("moduleBuilderFactory", () => {
     describe("actions", () => {
+        it("should pass options from moduleFactory to actionFactory", () => {
+            // given
+            const options = { bar: "baz" } as BuilderFactoryOptions<unknown>
+
+            // when
+            moduleBuilderFactory(options)
+
+            // then
+            expect(mockActionBuilderFactory).toBeCalledWith(options)
+        })
+
         it("should pipe to actionFactory.generate when calling addAction", () => {
             // given
             const factory = moduleBuilderFactory()
@@ -69,6 +87,17 @@ describe("moduleBuilderFactory", () => {
     })
 
     describe("mutations", () => {
+        it("should pass options from moduleFactory to actionFactory", () => {
+            // given
+            const options = { bar: "baz" } as BuilderFactoryOptions<unknown>
+
+            // when
+            moduleBuilderFactory(options)
+
+            // then
+            expect(mockMutationBuilderFactory).toBeCalledWith(options)
+        })
+
         it("should pipe to mutationFactory.generate when calling addMutation", () => {
             // given
             const factory = moduleBuilderFactory()
@@ -98,6 +127,17 @@ describe("moduleBuilderFactory", () => {
     })
 
     describe("getters", () => {
+        it("should pass options from moduleFactory to actionFactory", () => {
+            // given
+            const options = { bar: "baz" } as BuilderFactoryOptions<unknown>
+
+            // when
+            moduleBuilderFactory(options)
+
+            // then
+            expect(mockGetterBuilderFactory).toBeCalledWith(options)
+        })
+
         it("should pipe to getterFactory.generate when calling addGetter", () => {
             // given
             const factory = moduleBuilderFactory()

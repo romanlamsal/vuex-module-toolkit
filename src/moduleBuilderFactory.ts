@@ -29,7 +29,7 @@ export const moduleBuilderFactory = <State, RootState = unknown, NamespaceArgs =
 ) => {
     const actionFactory = actionBuilderFactory<State, RootState, NamespaceArgs>(options)
     const mutationFactory = mutationBuilderFactory<State, NamespaceArgs>(options)
-    const getterFactory = getterBuilderFactory<State, RootState, NamespaceArgs>()
+    const getterFactory = getterBuilderFactory<State, RootState, NamespaceArgs>(options)
 
     const namespaceBuilder: (args: NamespaceArgs) => string =
         options?.namespaceBuilder || (options?.namespace && (() => options.namespace!)) || (args => `${args}`)
