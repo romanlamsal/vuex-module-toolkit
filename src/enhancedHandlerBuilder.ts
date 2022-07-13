@@ -1,10 +1,14 @@
 export type EnhancedHandlerOptions = { namespace?: string }
 
-export interface EnhancedHandler<Payload = unknown, HandlerType = Function, NamespaceArgs = void, EventType = unknown> {
-    (payload: Payload, options?: BuilderFactoryOptions<NamespaceArgs>): EventType
-
+export type TreeNode<HandlerType> = {
     type: string
     handler: HandlerType
+}
+
+export interface EnhancedHandler<Payload = unknown, HandlerType = Function, NamespaceArgs = void, EventType = unknown>
+    extends TreeNode<HandlerType> {
+    (payload: Payload, options?: BuilderFactoryOptions<NamespaceArgs>): EventType
+
     namespaced: NamespaceArgs extends void ? FixedNamespaceFn<Payload, EventType> : DynamicNamespaceFn<Payload, NamespaceArgs, EventType>
 }
 

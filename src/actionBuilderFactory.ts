@@ -1,6 +1,7 @@
 import { ActionTree } from "vuex"
 import { actionBuilder, EnhancedAction, TypedActionHandler } from "./actionBuilder"
 import { BuilderFactoryOptions, EnhancedHandler } from "./enhancedHandlerBuilder"
+import { nodesToTree } from "./nodesToTree"
 
 export const actionBuilderFactory = <State, RootState, NamespaceArgs = void>(factoryOptions?: BuilderFactoryOptions<NamespaceArgs>) => {
     const enhancedActions: EnhancedHandler[] = []
@@ -16,13 +17,7 @@ export const actionBuilderFactory = <State, RootState, NamespaceArgs = void>(fac
         },
 
         toActionTree(): ActionTree<State, RootState> {
-            return enhancedActions.reduce(
-                (actionTree, enhancedAction) => ({
-                    ...actionTree,
-                    [enhancedAction.type]: enhancedAction.handler,
-                }),
-                {}
-            )
+            return nodesToTree(enhancedActions)
         },
     }
 }

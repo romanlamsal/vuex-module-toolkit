@@ -2,6 +2,7 @@ import { BuilderFactoryOptions } from "./enhancedHandlerBuilder"
 import { actionBuilderFactory } from "./actionBuilderFactory"
 import { mapState, Module, Store } from "vuex"
 import { mutationBuilderFactory } from "./mutationBuilderFactory"
+import { getterBuilderFactory } from "./getterBuilderFactory"
 
 type ModuleBuilderFactoryOptions<NamespaceArgs> = BuilderFactoryOptions<NamespaceArgs>
 
@@ -23,6 +24,7 @@ export const moduleBuilderFactory = <State, RootState = unknown, NamespaceArgs =
 ) => {
     const actionFactory = actionBuilderFactory<State, RootState, NamespaceArgs>(options)
     const mutationFactory = mutationBuilderFactory<State, NamespaceArgs>(options)
+    const getterFactory = getterBuilderFactory<State, RootState>()
 
     const namespaceBuilder: (args: NamespaceArgs) => string =
         options?.namespaceBuilder || (options?.namespace && (() => options.namespace!)) || (args => `${args}`)
@@ -31,6 +33,7 @@ export const moduleBuilderFactory = <State, RootState = unknown, NamespaceArgs =
         namespaced: true,
         mutations: mutationFactory.toMutationTree(),
         actions: actionFactory.toActionTree(),
+        getters: getterFactory.toGetterTree(),
         state: initialState,
     })
 
@@ -49,6 +52,7 @@ export const moduleBuilderFactory = <State, RootState = unknown, NamespaceArgs =
         namespace: namespaceFn,
         addAction: actionFactory.generate,
         addMutation: mutationFactory.generate,
+        addGetter: getterFactory.generate,
         hasModule: (store: Store<RootState>, nsArgs: NamespaceArgs) => store.hasModule(namespaceBuilder(nsArgs)),
         register: async (
             store: Store<RootState>,

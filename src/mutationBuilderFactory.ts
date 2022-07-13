@@ -1,6 +1,7 @@
 import { MutationTree } from "vuex"
 import { BuilderFactoryOptions, EnhancedHandler } from "./enhancedHandlerBuilder"
 import { EnhancedMutation, mutationBuilder, TypedMutationHandler } from "./mutationBuilder"
+import { nodesToTree } from "./nodesToTree"
 
 export const mutationBuilderFactory = <State, NamespaceArgs = void>(options?: BuilderFactoryOptions<NamespaceArgs>) => {
     const enhancedMutations: EnhancedHandler[] = []
@@ -17,13 +18,7 @@ export const mutationBuilderFactory = <State, NamespaceArgs = void>(options?: Bu
         },
 
         toMutationTree(): MutationTree<State> {
-            return enhancedMutations.reduce(
-                (mutationTree, enhancedMutation) => ({
-                    ...mutationTree,
-                    [enhancedMutation.type]: enhancedMutation.handler,
-                }),
-                {}
-            )
+            return nodesToTree(enhancedMutations)
         },
     }
 }

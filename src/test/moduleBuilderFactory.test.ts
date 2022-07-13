@@ -23,6 +23,17 @@ jest.mock("../mutationBuilderFactory", () => {
     }
 })
 
+const mockGenerateGetter = jest.fn()
+const mockToGetterTree = jest.fn()
+jest.mock("../getterBuilderFactory", () => {
+    return {
+        getterBuilderFactory: jest.fn(() => ({
+            generate: mockGenerateGetter,
+            toGetterTree: mockToGetterTree,
+        })),
+    }
+})
+
 jest.mock("vuex")
 const mockMapState = mapState as jest.Mock
 
@@ -82,6 +93,35 @@ describe("moduleBuilderFactory", () => {
 
             // then
             expect(module.mutations).toEqual(mutationTree)
+        })
+    })
+
+    describe("getters", () => {
+        it("should pipe to getterFactory.generate when calling addGetter", () => {
+            // given
+            const factory = moduleBuilderFactory()
+            const type = "sometype"
+            const handler = () => {}
+
+            // when
+            factory.addGetter(type, handler)
+
+            // then
+            expect(mockGenerateGetter).toBeCalledWith(type, handler)
+            expect(mockGenerateGetter).toBeCalledTimes(1)
+        })
+
+        it("should use getterFactory.toGetterTree in module", () => {
+            // given
+            const factory = moduleBuilderFactory<string>()
+            const getterTree = { foo: "bar" }
+            mockToGetterTree.mockReturnValueOnce(getterTree)
+
+            // when
+            const module = factory.getModule("initial")
+
+            // then
+            expect(module.getters).toEqual(getterTree)
         })
     })
 
