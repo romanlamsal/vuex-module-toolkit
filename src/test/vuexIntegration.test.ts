@@ -122,17 +122,6 @@ describe("with vuex store", () => {
             expect(moduleFactory.storeState(store, id).value).toEqual(newValue)
         })
 
-        it("should properly mutate value via mutation.commit", () => {
-            // given
-            const newValue = 42
-
-            // when
-            setMutation.commitNamespaced(store, id, newValue)
-
-            // then
-            expect(moduleFactory.storeState(store, id).value).toEqual(newValue)
-        })
-
         it("should dispatch a proper action via store.dispatch", () => {
             // given
             const newValue = 42
@@ -143,16 +132,9 @@ describe("with vuex store", () => {
             // then
             expect(moduleFactory.storeState(store, id).value).toEqual(newValue)
         })
-
-        it("should dispatch a proper action via action.dispatch", () => {
-            // given
-            const newValue = 42
-
-            // when
-            setAction.dispatchNamespaced(store, id, newValue)
-
-            // then
-            expect(moduleFactory.storeState(store, id).value).toEqual(newValue)
-        })
     })
+})
+
+moduleBuilderFactory<string, string>({
+    namespace: "",
 })

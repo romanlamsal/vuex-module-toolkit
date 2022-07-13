@@ -46,19 +46,5 @@ describe("actionBuilder", () => {
             // then
             expect(store.dispatch).toBeCalledWith(action(payload))
         })
-
-        it("should dispatch namespaced directly to store", () => {
-            // given
-            const payload = { foo: "bar" }
-            const type = "sometype"
-            const namespace = "foo/bar"
-            const action = actionBuilder(type, jest.fn())
-
-            // when
-            action.dispatchNamespaced(store, namespace, payload)
-
-            // then
-            expect(store.dispatch).toBeCalledWith(action.namespaced(namespace, payload))
-        })
     })
 })

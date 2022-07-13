@@ -2,7 +2,7 @@ import { MutationTree } from "vuex"
 import { BuilderFactoryOptions, EnhancedHandler } from "./enhancedHandlerBuilder"
 import { EnhancedMutation, mutationBuilder, TypedMutationHandler } from "./mutationBuilder"
 
-export const mutationBuilderFactory = <State, NamespaceArgs = unknown>(options?: BuilderFactoryOptions<NamespaceArgs>) => {
+export const mutationBuilderFactory = <State, NamespaceArgs = void>(options?: BuilderFactoryOptions<NamespaceArgs>) => {
     const enhancedMutations: EnhancedHandler[] = []
 
     return {

@@ -11,7 +11,7 @@ type RegisterOptions<State, NamespaceArgs> = {
     continueOnDuplicate?: boolean
 }
 
-export const moduleBuilderFactory = <State, RootState = unknown, NamespaceArgs = never>(
+export const moduleBuilderFactory = <State, RootState = unknown, NamespaceArgs = void>(
     options?: ModuleBuilderFactoryOptions<NamespaceArgs>
 ) => {
     const actionFactory = actionBuilderFactory<State, RootState, NamespaceArgs>(options)

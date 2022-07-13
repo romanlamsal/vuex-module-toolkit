@@ -46,19 +46,5 @@ describe("mutationBuilder", () => {
             // then
             expect(store.commit).toBeCalledWith(mutation(payload))
         })
-
-        it("should commit namespaced directly to store", () => {
-            // given
-            const payload = { foo: "bar" }
-            const type = "sometype"
-            const namespace = "foo/bar"
-            const mutation = mutationBuilder(type, jest.fn())
-
-            // when
-            mutation.commitNamespaced(store, namespace, payload)
-
-            // then
-            expect(store.commit).toBeCalledWith(mutation.namespaced(namespace, payload))
-        })
     })
 })

@@ -1,12 +1,19 @@
 export type EnhancedHandlerOptions = { namespace?: string }
 
-export interface EnhancedHandler<Payload = unknown, HandlerType = Function, NamespaceArgs = unknown, EventType = unknown> {
+export interface EnhancedHandler<Payload = unknown, HandlerType = Function, NamespaceArgs = void, EventType = unknown> {
     (payload: Payload, options?: BuilderFactoryOptions<NamespaceArgs>): EventType
 
     type: string
     handler: HandlerType
-    namespaced: (nsArgs: NamespaceArgs, payload: Payload, options?: EnhancedHandlerOptions) => EventType
+    namespaced: NamespaceArgs extends void ? FixedNamespaceFn<Payload, EventType> : DynamicNamespaceFn<Payload, NamespaceArgs, EventType>
 }
+
+type FixedNamespaceFn<Payload, EventType> = (payload: Payload, options?: EnhancedHandlerOptions) => EventType
+type DynamicNamespaceFn<Payload, NamespaceArgs, EventType> = (
+    nsArgs: NamespaceArgs,
+    payload: Payload,
+    options?: EnhancedHandlerOptions
+) => EventType
 
 export type BuilderFactoryOptions<NamespaceArgs> = {
     namespace?: string
@@ -16,22 +23,16 @@ export type BuilderFactoryOptions<NamespaceArgs> = {
 export const enhancedHandlerBuilder = <
     Payload = unknown,
     HandlerType = unknown,
-    NamespaceArgs = unknown,
-    EventType extends { type: string; payload: Payload } = { type: string; payload: Payload },
-    EnhancedHandlerType extends EnhancedHandler<Payload, HandlerType, NamespaceArgs, EventType> = EnhancedHandler<
-        Payload,
-        HandlerType,
-        NamespaceArgs,
-        EventType
-    >
+    NamespaceArgs = void,
+    EventType extends { type: string; payload: Payload } = { type: string; payload: Payload }
 >(
     type: string,
     handler: HandlerType,
     factoryOptions?: BuilderFactoryOptions<NamespaceArgs>
-): EnhancedHandlerType => {
+): EnhancedHandler<Payload, HandlerType, NamespaceArgs, EventType> => {
     const namespaceBuilder: (args: NamespaceArgs) => string = factoryOptions?.namespaceBuilder || (args => `${args}`)
 
-    const enhancedHandler: EnhancedHandler<Payload, HandlerType, NamespaceArgs, EventType> = (payload, options) => {
+    const enhancedHandler: EnhancedHandler<Payload, HandlerType, any, EventType> = (payload, options) => {
         let namespacedType = type
 
         if (options?.namespace) {
@@ -46,8 +47,20 @@ export const enhancedHandlerBuilder = <
 
     enhancedHandler.type = type
     enhancedHandler.handler = handler
-    enhancedHandler.namespaced = (nsArgs, payload, options) =>
+
+    const fixedNamespaced: FixedNamespaceFn<Payload, EventType> = (payload, options) =>
+        enhancedHandler(payload, { namespace: options?.namespace || factoryOptions?.namespace }) as EventType
+
+    const dynamicNamespaced: DynamicNamespaceFn<Payload, NamespaceArgs, EventType> = (nsArgs, payload, options) =>
         enhancedHandler(payload, { namespace: options?.namespace || namespaceBuilder(nsArgs) }) as EventType
 
-    return enhancedHandler as EnhancedHandlerType
+    if (factoryOptions?.namespace) {
+        const castedEnhancedHandler = enhancedHandler as EnhancedHandler<Payload, HandlerType, void, EventType>
+        castedEnhancedHandler.namespaced = fixedNamespaced
+        return enhancedHandler
+    }
+
+    enhancedHandler.namespaced = dynamicNamespaced
+
+    return enhancedHandler
 }

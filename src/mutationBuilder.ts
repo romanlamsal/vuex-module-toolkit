@@ -13,25 +13,21 @@ export interface EnhancedMutation<Payload, State, NamespaceArgs>
     (payload: Payload, options?: EnhancedHandlerOptions): MutationEvent<Payload>
 
     commit: (store: Store<unknown>, payload: Payload, options?: EnhancedHandlerOptions) => void
-    commitNamespaced: (store: Store<unknown>, nsArgs: NamespaceArgs, payload: Payload, options?: EnhancedHandlerOptions) => void
 }
 
-export const mutationBuilder = <Payload, State, NamespaceArgs = unknown>(
+export const mutationBuilder = <Payload, State, NamespaceArgs = void>(
     type: string,
     mutationHandler: TypedMutationHandler<Payload, State>,
     factoryOptions?: BuilderFactoryOptions<NamespaceArgs>
 ): EnhancedMutation<Payload, State, NamespaceArgs> => {
-    const mutationDispatch = enhancedHandlerBuilder<
-        Payload,
-        TypedMutationHandler<Payload, State>,
-        NamespaceArgs,
-        MutationEvent<Payload>,
-        EnhancedMutation<Payload, State, NamespaceArgs>
-    >(type, mutationHandler, factoryOptions)
+    const mutationDispatch = enhancedHandlerBuilder<Payload, TypedMutationHandler<Payload, State>, NamespaceArgs, MutationEvent<Payload>>(
+        type,
+        mutationHandler,
+        factoryOptions
+    ) as EnhancedMutation<Payload, State, NamespaceArgs>
 
     mutationDispatch.commit = (store, payload, options) => store.commit(mutationDispatch(payload, options))
-    mutationDispatch.commitNamespaced = (store, nsArgs, payload, options) =>
-        store.commit(mutationDispatch.namespaced(nsArgs, payload, options))
+    // mutationDispatch.commitNamespaced = (store, ...args) => store.commit(mutationDispatch.namespaced(...args))
 
     return mutationDispatch
 }

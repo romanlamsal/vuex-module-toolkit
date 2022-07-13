@@ -57,7 +57,7 @@ describe("enhancedHandlerBuilder without store", () => {
             // given
             const namespace = "foo/bar"
             const type = "sometype"
-            const action = enhancedHandlerBuilder(type, jest.fn())
+            const action = enhancedHandlerBuilder<number, unknown, string>(type, jest.fn())
 
             // when
             const actionEvent = action.namespaced(namespace, 42)
@@ -71,7 +71,7 @@ describe("enhancedHandlerBuilder without store", () => {
             const namespaceBuilder = jest.fn(() => "foo/bar")
             const type = "sometype"
             const nsArgs = "baz"
-            const action = enhancedHandlerBuilder(type, jest.fn(), { namespaceBuilder })
+            const action = enhancedHandlerBuilder<number, unknown, string>(type, jest.fn(), { namespaceBuilder })
 
             // when
             const actionEvent = action.namespaced(nsArgs, 42)
@@ -100,7 +100,7 @@ describe("enhancedHandlerBuilder without store", () => {
             const namespace = "foo/bar"
             const type = "sometype"
             const namespaceBuilder = jest.fn(() => "this/is/wrong")
-            const action = enhancedHandlerBuilder(type, jest.fn(), { namespaceBuilder })
+            const action = enhancedHandlerBuilder<number, unknown, string>(type, jest.fn(), { namespaceBuilder })
 
             // when
             const actionEvent = action.namespaced("", 42, { namespace })
@@ -122,6 +122,19 @@ describe("enhancedHandlerBuilder without store", () => {
             // then
             expect(actionEvent.type).toEqual(type)
             expect(namespaceBuilder).not.toBeCalled()
+        })
+
+        it("should set the namespace from factoryOptions.namespace and alter .namespaced's signature", () => {
+            // given
+            const namespace = "foo/bar"
+            const type = "sometype"
+            const action = enhancedHandlerBuilder(type, jest.fn(), { namespace })
+
+            // when
+            const actionEvent = action.namespaced(42)
+
+            // then
+            expect(actionEvent.type).toEqual(namespace + "/" + type)
         })
     })
 })

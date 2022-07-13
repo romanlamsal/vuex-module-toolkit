@@ -2,7 +2,7 @@ import { ActionTree } from "vuex"
 import { actionBuilder, EnhancedAction, TypedActionHandler } from "./actionBuilder"
 import { BuilderFactoryOptions, EnhancedHandler } from "./enhancedHandlerBuilder"
 
-export const actionBuilderFactory = <State, RootState, NamespaceArgs = unknown>(factoryOptions?: BuilderFactoryOptions<NamespaceArgs>) => {
+export const actionBuilderFactory = <State, RootState, NamespaceArgs = void>(factoryOptions?: BuilderFactoryOptions<NamespaceArgs>) => {
     const enhancedActions: EnhancedHandler[] = []
 
     return {
