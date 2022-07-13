@@ -1,5 +1,5 @@
 import { moduleBuilderFactory } from "../moduleBuilderFactory"
-import { Store } from "vuex"
+import { mapState, Store } from "vuex"
 
 const mockGenerateAction = jest.fn()
 const mockToActionTree = jest.fn()
@@ -22,6 +22,9 @@ jest.mock("../mutationBuilderFactory", () => {
         })),
     }
 })
+
+jest.mock("vuex")
+const mockMapState = mapState as jest.Mock
 
 describe("moduleBuilderFactory", () => {
     describe("actions", () => {
@@ -338,6 +341,43 @@ describe("moduleBuilderFactory", () => {
                 expect(registerReturn).toBeFalsy()
                 expect(mockHasModule).toBeCalledTimes(1)
             })
+        })
+    })
+
+    describe("mapState", () => {
+        type ModuleState = {
+            foo: string
+            bar: number
+            baz: Array<string | number>
+        }
+
+        it("should pipe to vuex.mapState with fixed namespace", () => {
+            // given
+            const namespace = "thenamespace"
+            const expr = ["foo" as keyof ModuleState]
+            const factory = moduleBuilderFactory<ModuleState>({ namespace })
+
+            // when
+            factory.mapState(expr)
+
+            // then
+            expect(mockMapState).toBeCalledWith(factory.namespace, expr)
+            expect(mockMapState).toBeCalledTimes(1)
+        })
+
+        it("should pipe to vuex.mapState with dynamic namespace", () => {
+            // given
+            const namespaceArgs = "foo"
+            const namespaceBuilder = (args: string) => `${args}/bar/baz`
+            const expr = ["foo" as keyof ModuleState]
+            const factory = moduleBuilderFactory<ModuleState, unknown, string>({ namespaceBuilder })
+
+            // when
+            factory.mapState(namespaceArgs, expr)
+
+            // then
+            expect(mockMapState).toBeCalledWith(factory.namespace(namespaceArgs), expr)
+            expect(mockMapState).toBeCalledTimes(1)
         })
     })
 })

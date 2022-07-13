@@ -1,6 +1,6 @@
 import { BuilderFactoryOptions } from "./enhancedHandlerBuilder"
 import { actionBuilderFactory } from "./actionBuilderFactory"
-import { Module, Store } from "vuex"
+import { mapState, Module, Store } from "vuex"
 import { mutationBuilderFactory } from "./mutationBuilderFactory"
 
 type ModuleBuilderFactoryOptions<NamespaceArgs> = BuilderFactoryOptions<NamespaceArgs>
@@ -10,7 +10,13 @@ type RegisterOptions<State, NamespaceArgs> = {
     continueOnDuplicate?: boolean
 } & (NamespaceArgs extends void ? { namespaceArgs?: void } : { namespaceArgs: NamespaceArgs })
 
-type NamespaceFn<T> = T extends void ? string : (args: T) => string
+type NamespaceFn<NamespaceArgs> = NamespaceArgs extends void ? string : (args: NamespaceArgs) => string
+
+type MapStateExpr<State> = Extract<keyof State, string>[]
+
+type MapStateFn<State, NamespaceArgs> = NamespaceArgs extends void
+    ? (expr: MapStateExpr<State>) => ReturnType<typeof mapState>
+    : (nsArgs: NamespaceArgs, expr: MapStateExpr<State>) => ReturnType<typeof mapState>
 
 export const moduleBuilderFactory = <State, RootState = unknown, NamespaceArgs = void>(
     options?: ModuleBuilderFactoryOptions<NamespaceArgs>
@@ -28,7 +34,15 @@ export const moduleBuilderFactory = <State, RootState = unknown, NamespaceArgs =
         state: initialState,
     })
 
-    const namespaceFn = (options?.namespace ? options.namespace! : namespaceBuilder) as NamespaceFn<NamespaceArgs>
+    const namespaceFn: NamespaceFn<NamespaceArgs> = (
+        options?.namespace ? options.namespace! : namespaceBuilder
+    ) as NamespaceFn<NamespaceArgs>
+
+    const mapStateFn = (
+        options?.namespace
+            ? (((expr: MapStateExpr<State>) => mapState(options.namespace!, expr)) as MapStateFn<State, void>)
+            : (nsArgs: NamespaceArgs, expr: MapStateExpr<State>) => mapState(namespaceBuilder(nsArgs), expr)
+    ) as MapStateFn<State, NamespaceArgs>
 
     return {
         getModule,
@@ -54,5 +68,6 @@ export const moduleBuilderFactory = <State, RootState = unknown, NamespaceArgs =
             // @ts-ignore
             return store.state[namespaceBuilder(nsArgs)]
         },
+        mapState: mapStateFn,
     }
 }
