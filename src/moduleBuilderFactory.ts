@@ -6,10 +6,11 @@ import { mutationBuilderFactory } from "./mutationBuilderFactory"
 type ModuleBuilderFactoryOptions<NamespaceArgs> = BuilderFactoryOptions<NamespaceArgs>
 
 type RegisterOptions<State, NamespaceArgs> = {
-    namespaceArgs: NamespaceArgs
     initialState: State
     continueOnDuplicate?: boolean
-}
+} & (NamespaceArgs extends void ? { namespaceArgs?: void } : { namespaceArgs: NamespaceArgs })
+
+type NamespaceFn<T> = T extends void ? string : (args: T) => string
 
 export const moduleBuilderFactory = <State, RootState = unknown, NamespaceArgs = void>(
     options?: ModuleBuilderFactoryOptions<NamespaceArgs>
@@ -17,7 +18,8 @@ export const moduleBuilderFactory = <State, RootState = unknown, NamespaceArgs =
     const actionFactory = actionBuilderFactory<State, RootState, NamespaceArgs>(options)
     const mutationFactory = mutationBuilderFactory<State, NamespaceArgs>(options)
 
-    const namespaceBuilder: (args: NamespaceArgs) => string = options?.namespaceBuilder || (args => `${args}`)
+    const namespaceBuilder: (args: NamespaceArgs) => string =
+        options?.namespaceBuilder || (options?.namespace && (() => options.namespace!)) || (args => `${args}`)
 
     const getModule = (initialState: State): Module<State, RootState> => ({
         namespaced: true,
@@ -26,9 +28,11 @@ export const moduleBuilderFactory = <State, RootState = unknown, NamespaceArgs =
         state: initialState,
     })
 
+    const namespaceFn = (options?.namespace ? options.namespace! : namespaceBuilder) as NamespaceFn<NamespaceArgs>
+
     return {
         getModule,
-        getNamespace: (nsArgs: NamespaceArgs) => namespaceBuilder(nsArgs),
+        namespace: namespaceFn,
         addAction: actionFactory.generate,
         addMutation: mutationFactory.generate,
         hasModule: (store: Store<RootState>, nsArgs: NamespaceArgs) => store.hasModule(namespaceBuilder(nsArgs)),
@@ -36,7 +40,7 @@ export const moduleBuilderFactory = <State, RootState = unknown, NamespaceArgs =
             store: Store<RootState>,
             { namespaceArgs, initialState, continueOnDuplicate }: RegisterOptions<State, NamespaceArgs>
         ) => {
-            const namespace = namespaceBuilder(namespaceArgs)
+            const namespace = namespaceBuilder(namespaceArgs as NamespaceArgs)
 
             if (continueOnDuplicate && store.hasModule(namespace)) {
                 return false

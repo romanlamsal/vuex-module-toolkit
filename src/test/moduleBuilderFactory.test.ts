@@ -89,7 +89,7 @@ describe("moduleBuilderFactory", () => {
             const factory = moduleBuilderFactory<unknown, unknown, string>()
 
             // when
-            const namespace = factory.getNamespace(givenNamespace)
+            const namespace = factory.namespace(givenNamespace)
 
             // then
             expect(namespace).toEqual(givenNamespace)
@@ -160,6 +160,18 @@ describe("moduleBuilderFactory", () => {
             expect(mockRegister).toBeCalledWith(namespaceBuilder(namespaceArgs), expect.anything())
         })
 
+        it("should register under options.namespace when no namespaceArgs are given", () => {
+            // given
+            const namespace = "foobarbaz"
+            const factory = moduleBuilderFactory({ namespace })
+
+            // when
+            factory.register(store, { initialState: "" })
+
+            // then
+            expect(mockRegister).toBeCalledWith(namespace, expect.anything())
+        })
+
         it("should register with new module instance and given initialstate", () => {
             // given
             const factory = moduleBuilderFactory<unknown, {}, string>()
@@ -204,6 +216,46 @@ describe("moduleBuilderFactory", () => {
             // then
             expect(mockHasModule).toBeCalledWith(namespaceBuilder(namespaceArgs))
             expect(mockHasModule).toBeCalledTimes(1)
+        })
+
+        it("should use option.namespace when calling store.hasModule", () => {
+            // given
+            const namespace = "foobarbaz"
+            const factory = moduleBuilderFactory({ namespace })
+
+            // when
+            factory.hasModule(store)
+
+            // then
+            expect(mockHasModule).toBeCalledWith(namespace)
+        })
+
+        describe("getNamespace", () => {
+            it("should return options.namespace when getNamespace is called when no namespaceBuilder is given", () => {
+                // given
+                const namespace = "thenamespace"
+
+                // when
+                const factory = moduleBuilderFactory({ namespace })
+
+                // then
+                expect(factory.namespace).toEqual(namespace)
+            })
+
+            it("should return options.namespaceBuilder when getNamespace is called", () => {
+                // given
+                const nsArgs = "foobarbaz"
+                const namespace = "thenamespace"
+                const namespaceBuilder = jest.fn(() => namespace)
+                const factory = moduleBuilderFactory<unknown, unknown, string>({ namespaceBuilder })
+
+                // when
+                const returnedNamespace = factory.namespace(nsArgs)
+
+                // then
+                expect(returnedNamespace).toEqual(namespace)
+                expect(namespaceBuilder).toBeCalledWith(nsArgs)
+            })
         })
 
         describe("continueOnDuplicate", () => {

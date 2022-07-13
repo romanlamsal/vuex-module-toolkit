@@ -134,7 +134,3 @@ describe("with vuex store", () => {
         })
     })
 })
-
-moduleBuilderFactory<string, string>({
-    namespace: "",
-})
