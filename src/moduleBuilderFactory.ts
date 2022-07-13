@@ -1,8 +1,8 @@
 import { BuilderFactoryOptions } from "./enhancedHandlerBuilder"
 import { actionBuilderFactory } from "./actionBuilderFactory"
-import { mapState, Module, Store } from "vuex"
+import { mapGetters, mapState, Module, Store } from "vuex"
 import { mutationBuilderFactory } from "./mutationBuilderFactory"
-import { getterBuilderFactory } from "./getterBuilderFactory"
+import { EnhancedGetter, getterBuilderFactory } from "./getterBuilderFactory"
 
 type ModuleBuilderFactoryOptions<NamespaceArgs> = BuilderFactoryOptions<NamespaceArgs>
 
@@ -18,6 +18,10 @@ type MapStateExpr<State> = Extract<keyof State, string>[]
 type MapStateFn<State, NamespaceArgs> = NamespaceArgs extends void
     ? (expr: MapStateExpr<State>) => ReturnType<typeof mapState>
     : (nsArgs: NamespaceArgs, expr: MapStateExpr<State>) => ReturnType<typeof mapState>
+
+type MapGettersFn<State, RootState, NamespaceArgs> = NamespaceArgs extends void
+    ? (...getters: EnhancedGetter<State, RootState>[]) => ReturnType<typeof mapGetters>
+    : (nsArgs: NamespaceArgs, ...getters: EnhancedGetter<State, RootState>[]) => ReturnType<typeof mapGetters>
 
 export const moduleBuilderFactory = <State, RootState = unknown, NamespaceArgs = void>(
     options?: ModuleBuilderFactoryOptions<NamespaceArgs>
@@ -47,6 +51,20 @@ export const moduleBuilderFactory = <State, RootState = unknown, NamespaceArgs =
             : (nsArgs: NamespaceArgs, expr: MapStateExpr<State>) => mapState(namespaceBuilder(nsArgs), expr)
     ) as MapStateFn<State, NamespaceArgs>
 
+    const mapGettersFn = (
+        options?.namespace
+            ? (((...getters) =>
+                  mapGetters(
+                      options.namespace!,
+                      getters.map(getter => getter.type)
+                  )) as MapGettersFn<State, RootState, void>)
+            : (nsArgs: NamespaceArgs, ...getters: EnhancedGetter<State, RootState>[]) =>
+                  mapGetters(
+                      namespaceBuilder(nsArgs),
+                      getters.map(getter => getter.type)
+                  )
+    ) as MapGettersFn<State, RootState, NamespaceArgs>
+
     return {
         getModule,
         namespace: namespaceFn,
@@ -73,5 +91,6 @@ export const moduleBuilderFactory = <State, RootState = unknown, NamespaceArgs =
             return store.state[namespaceBuilder(nsArgs)]
         },
         mapState: mapStateFn,
+        mapGetters: mapGettersFn,
     }
 }

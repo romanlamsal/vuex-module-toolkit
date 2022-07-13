@@ -1,5 +1,5 @@
 import { moduleBuilderFactory } from "../moduleBuilderFactory"
-import { mapState, Store } from "vuex"
+import { mapGetters, mapState, Store } from "vuex"
 
 const mockGenerateAction = jest.fn()
 const mockToActionTree = jest.fn()
@@ -36,6 +36,7 @@ jest.mock("../getterBuilderFactory", () => {
 
 jest.mock("vuex")
 const mockMapState = mapState as jest.Mock
+const mockMapGetters = mapGetters as jest.Mock
 
 describe("moduleBuilderFactory", () => {
     describe("actions", () => {
@@ -418,6 +419,49 @@ describe("moduleBuilderFactory", () => {
             // then
             expect(mockMapState).toBeCalledWith(factory.namespace(namespaceArgs), expr)
             expect(mockMapState).toBeCalledTimes(1)
+        })
+    })
+
+    describe("mapGetters", () => {
+        type ModuleState = {
+            foo: string
+            bar: number
+            baz: Array<string | number>
+        }
+
+        beforeEach(() => {
+            mockGenerateGetter.mockImplementation(type => ({ type }))
+        })
+
+        it("should pipe to vuex.mapGetters with fixed namespace and multiple getters", () => {
+            // given
+            const namespace = "thenamespace"
+            const factory = moduleBuilderFactory<ModuleState>({ namespace })
+            const firstGetter = factory.addGetter("bar", () => "baz")
+            const secondGetter = factory.addGetter("baz", () => "foobar")
+
+            // when
+            factory.mapGetters(firstGetter, secondGetter)
+
+            // then
+            expect(mockMapGetters).toBeCalledWith(factory.namespace, [firstGetter.type, secondGetter.type])
+            expect(mockMapGetters).toBeCalledTimes(1)
+        })
+
+        it("should pipe to vuex.mapGetters with dynamic namespace and multiple getters", () => {
+            // given
+            const namespaceArgs = "foo"
+            const namespaceBuilder = (args: string) => `${args}/bar/baz`
+            const factory = moduleBuilderFactory<ModuleState, unknown, string>({ namespaceBuilder })
+            const firstGetter = factory.addGetter("bar", () => "baz")
+            const secondGetter = factory.addGetter("baz", () => "foobar")
+
+            // when
+            factory.mapGetters(namespaceArgs, firstGetter, secondGetter)
+
+            // then
+            expect(mockMapGetters).toBeCalledWith(factory.namespace(namespaceArgs), [firstGetter.type, secondGetter.type])
+            expect(mockMapGetters).toBeCalledTimes(1)
         })
     })
 })
